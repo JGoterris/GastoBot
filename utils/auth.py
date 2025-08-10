@@ -11,7 +11,14 @@ def authorized_only(func):
     El ID del usuario autorizado debe estar en la variable de entorno MY_USER_ID.
     """
     @wraps(func)
-    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def wrapper(*args, **kwargs):
+        # Extraer el objeto 'update' de los argumentos
+        update = next((arg for arg in args if isinstance(arg, Update)), None)
+
+        if not update:
+            print("❌ ERROR: El decorador @authorized_only no pudo encontrar el objeto 'Update'.")
+            return
+
         user_id = update.effective_user.id
         user_name = update.effective_user.first_name
         username = update.effective_user.username or "Sin username"
@@ -30,7 +37,7 @@ def authorized_only(func):
         
         # Usuario autorizado - continuar con la función original
         print(f"✅ Usuario autorizado: {user_name} (@{username}) - ID: {user_id}")
-        return await func(update, context)
+        return await func(*args, **kwargs)
     
     return wrapper
 

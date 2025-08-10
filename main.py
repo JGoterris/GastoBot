@@ -56,11 +56,11 @@ def initialize_genai_service():
         print(f"❌ ERROR: No se pudo crear el cliente genai")
         return None
 
-def setup_handlers(application):
+def setup_handlers(application, sheets_controller: SheetsController):
     """Configurar todos los handlers del bot"""
     
     # Comandos principales
-    application.add_handler(CommandHandler("start", SheetsController.say_hello))
+    application.add_handler(CommandHandler("start", sheets_controller.say_hello))
     
     # Comando temporal para configuración (comentar después de configurar)
     application.add_handler(CommandHandler("myid", auth.get_user_id))
@@ -82,6 +82,8 @@ def main():
     if not sheet_service or not genai_service:
         exit(1)
     
+    # 2.1 Instanciar controladores
+    sheets_controller = SheetsController(sheet_service, genai_service)
 
     # 3. Crear aplicación de Telegram
     try:
@@ -92,7 +94,7 @@ def main():
         exit(1)
     
     # 4. Configurar handlers
-    setup_handlers(application)
+    setup_handlers(application, sheets_controller)
     
     # 5. Mostrar información de inicio
     print("=" * 50)
