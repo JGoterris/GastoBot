@@ -5,7 +5,7 @@ from services.SheetsService import SheetsService
 from controllers.sheets_controller import SheetsController
 import utils.auth as auth
 from services.GenaiService import GenaiService
-from Routes import Routes
+from utils.Routes import Routes
 
 # Cargar variables de entorno
 load_dotenv()
@@ -65,6 +65,8 @@ def setup_handlers(application, sheets_controller: SheetsController):
 
     # Funcionamiento principal
     application.add_handler(MessageHandler(filters.TEXT, sheets_controller.text_request))
+    application.add_handler(MessageHandler(filters.VOICE, sheets_controller.audio_request))
+    application.add_handler(MessageHandler(filters.PHOTO, sheets_controller.image_request))
     application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.ACEPTAR))
     
     print("✅ Todos los handlers configurados")
