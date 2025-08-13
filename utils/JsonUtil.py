@@ -17,8 +17,6 @@ def json_fuller(str_json: str):
 def json_formatter(str_json: str):
      data = json.loads(str_json)
      salida = f"""
-    🧾 **REVISIÓN DE GASTO** 🧾
-
     👕 **Establecimiento:** {data["establecimiento"]}
     💶 **Importe:** {data["importe"]}
     📝 **Descripción:** {data["descripcion"]}

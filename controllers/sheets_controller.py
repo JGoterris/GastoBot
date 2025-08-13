@@ -16,7 +16,7 @@ class SheetsController:
     async def text_request(self, update: Update, context = ContextTypes.DEFAULT_TYPE):
         str_json = self.genai_service.basic_request(update.message.text)
         fulled_json = json_fuller(str_json)
-        formated_json = json_formatter(fulled_json)
+        formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(fulled_json)
         keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton(text="✅ Aceptar", callback_data=Routes.ACEPTAR)
@@ -26,11 +26,13 @@ class SheetsController:
             ]
         ])
         context.user_data["json"] = fulled_json
-        await update.message.reply_text(formated_json, parse_mode="MARKDOWN", reply_markup=keyboard)
+        await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=keyboard)
     
     @authorized_only
     async def submit_gasto(self, update: Update, context = CallbackContext):
         json_data = context.user_data["json"]
         worksheet = self.sheet.get_worksheet(0)
         worksheet.append_row(to_list(json_data))
+        formatted_json = "🧾 **GASTO** 🧾\n\n" + json_formatter(json_data) + "\n\n✅ Subido"
         await update.callback_query.answer()
+        await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN")
