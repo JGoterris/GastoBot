@@ -1,10 +1,11 @@
 from dotenv import load_dotenv
 import os
-from telegram.ext import ApplicationBuilder, CommandHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from services.SheetsService import SheetsService
 from controllers.sheets_controller import SheetsController
 import utils.auth as auth
 from services.GenaiService import GenaiService
+from Routes import Routes
 
 # Cargar variables de entorno
 load_dotenv()
@@ -58,12 +59,13 @@ def initialize_genai_service():
 
 def setup_handlers(application, sheets_controller: SheetsController):
     """Configurar todos los handlers del bot"""
-    
-    # Comandos principales
-    application.add_handler(CommandHandler("start", sheets_controller.say_hello))
-    
+        
     # Comando temporal para configuración (comentar después de configurar)
     application.add_handler(CommandHandler("myid", auth.get_user_id))
+
+    # Funcionamiento principal
+    application.add_handler(MessageHandler(filters.TEXT, sheets_controller.text_request))
+    application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.ACEPTAR))
     
     print("✅ Todos los handlers configurados")
 
@@ -77,13 +79,13 @@ def main():
         exit(1)
     
     # 2. Inicializar servicios
-    sheet_service = initialize_sheets_service()
+    sheet = initialize_sheets_service()
     genai_service = initialize_genai_service()
-    if not sheet_service or not genai_service:
+    if not sheet or not genai_service:
         exit(1)
     
     # 2.1 Instanciar controladores
-    sheets_controller = SheetsController(sheet_service, genai_service)
+    sheets_controller = SheetsController(sheet, genai_service)
 
     # 3. Crear aplicación de Telegram
     try:
