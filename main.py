@@ -64,7 +64,7 @@ def setup_handlers(application, sheets_controller: SheetsController):
     application.add_handler(CommandHandler("myid", auth.get_user_id))
 
     # Funcionamiento principal
-    application.add_handler(MessageHandler(filters.TEXT, sheets_controller.text_request))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, sheets_controller.text_request))
     application.add_handler(MessageHandler(filters.VOICE, sheets_controller.audio_request))
     application.add_handler(MessageHandler(filters.PHOTO, sheets_controller.image_request))
     application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.ACEPTAR))
