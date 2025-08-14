@@ -79,7 +79,7 @@ class SheetsService:
             all_records = worksheet.get_all_records()
             
             if not all_records:
-                return "No hay gastos registrados este mes."
+                return
             
             # Calcular totales por categoría
             category_totals = {}
@@ -104,4 +104,4 @@ class SheetsService:
             return summary
             
         except Exception as e:
-            return f"Error al obtener resumen: {str(e)}"
+            return
