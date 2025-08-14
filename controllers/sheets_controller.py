@@ -1,6 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, CallbackContext, CallbackQueryHandler
 from services.GenaiService import GenaiService
+from services.SheetsService import SheetsService
 from utils.auth import authorized_only
 from utils.JsonUtil import json_fuller, json_formatter, to_list
 from utils.Routes import Routes
@@ -10,8 +11,8 @@ from utils.MenuTemplate import MenuTemplate
 
 
 class SheetsController:
-    def __init__(self, sheet: Spreadsheet, genai_service: GenaiService):
-        self.sheet = sheet
+    def __init__(self, sheet_service: SheetsService, genai_service: GenaiService):
+        self.sheet_service = sheet_service
         self.genai_service = genai_service
 
     @authorized_only
@@ -72,8 +73,7 @@ class SheetsController:
     @authorized_only
     async def submit_gasto(self, update: Update, context = CallbackContext):
         json_data = context.user_data["json"]
-        worksheet = self.sheet.get_worksheet(0)
-        worksheet.append_row(to_list(json_data))
+        self.sheet_service.upload_new_row(json_data)
         formatted_json = "🧾 **GASTO** 🧾\n\n" + json_formatter(json_data) + "\n\n✅ Subido"
         await update.callback_query.answer()
         await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN")

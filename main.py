@@ -35,10 +35,9 @@ def check_environment():
 def initialize_sheets_service():
     try:
         print("🔗 Conectando con Google Sheets...")
-        sheet_config = SheetsService("creds.json")
-        sheet = sheet_config.get_sheet_by_id(os.getenv("SHEET_ID"))
+        sheet_service = SheetsService("creds.json", os.getenv("SHEET_ID"))
         print("✅ Conexión con Google Sheets establecida")
-        return sheet
+        return sheet_service
     except FileNotFoundError:
         print("❌ ERROR: Archivo creds.json no encontrado")
         print("💡 Asegúrate de tener el archivo de credenciales de Google en la raíz del proyecto")
@@ -81,13 +80,13 @@ def main():
         exit(1)
     
     # 2. Inicializar servicios
-    sheet = initialize_sheets_service()
+    sheet_service = initialize_sheets_service()
     genai_service = initialize_genai_service()
-    if not sheet or not genai_service:
+    if not sheet_service or not genai_service:
         exit(1)
     
     # 2.1 Instanciar controladores
-    sheets_controller = SheetsController(sheet, genai_service)
+    sheets_controller = SheetsController(sheet_service, genai_service)
 
     # 3. Crear aplicación de Telegram
     try:
