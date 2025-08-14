@@ -58,7 +58,7 @@ class SheetsService:
             # Configurar encabezados
             headers = [
                 "Establecimiento", "Importe", "Descripción", 
-                "Fecha", "Categoria"
+                "Fecha", "Categoría"
             ]
             worksheet.append_row(headers)
             
@@ -69,3 +69,39 @@ class SheetsService:
             })
             
             return worksheet
+        
+    def get_monthly_summary(self, month_year=None):
+        """Obtiene resumen de gastos del mes"""
+        try:
+            worksheet = self.get_or_create_monthly_sheet(month_year)
+            
+            # Obtener todos los datos (excepto encabezados)
+            all_records = worksheet.get_all_records()
+            
+            if not all_records:
+                return "No hay gastos registrados este mes."
+            
+            # Calcular totales por categoría
+            category_totals = {}
+            total_month = 0
+            
+            for record in all_records:
+                categoria = record.get('Categoría', 'Sin categoría')
+                monto = float(record.get('Importe', 0.00)[:-1])
+                
+                category_totals[categoria] = category_totals.get(categoria, 0) + monto
+                total_month += monto
+            
+            # Crear resumen
+            summary = f"📊 Resumen de {worksheet.title}:\n\n"
+            summary += f"💰 Total del mes: {total_month:.2f} €\n\n"
+            summary += "📋 Por categorías:\n"
+            
+            for categoria, total in category_totals.items():
+                percentage = (total / total_month) * 100 if total_month > 0 else 0
+                summary += f"• {categoria}: {total:.2f} € ({percentage:.1f}%)\n"
+            
+            return summary
+            
+        except Exception as e:
+            return f"Error al obtener resumen: {str(e)}"

@@ -77,3 +77,7 @@ class SheetsController:
         formatted_json = "🧾 **GASTO** 🧾\n\n" + json_formatter(json_data) + "\n\n✅ Subido"
         await update.callback_query.answer()
         await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN")
+
+    @authorized_only
+    async def summary(self, update: Update, context = CallbackContext):
+        await update.message.reply_text(self.sheet_service.get_monthly_summary())

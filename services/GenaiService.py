@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class GenaiService:
-    EXTRACTION_PROMPT = """Extrae un json con los campos: establecimiento, importe, 
+    EXTRACTION_PROMPT = """Extrae un json con los campos: establecimiento, importe (formato: Número.Decimales €), 
     descripcion y categoria. Esta última tienes que elegir entre: ocio, ropa, 
     comida, necesidad, amigos, fiesta o varios.
     Si algún campo no tienes información suficiente, pon el campo en blanco, no te inventes la información.

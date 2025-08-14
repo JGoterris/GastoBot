@@ -67,6 +67,7 @@ def setup_handlers(application, sheets_controller: SheetsController):
     application.add_handler(MessageHandler(filters.VOICE, sheets_controller.audio_request))
     application.add_handler(MessageHandler(filters.PHOTO, sheets_controller.image_request))
     application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.ACEPTAR))
+    application.add_handler(CommandHandler("summary", sheets_controller.summary))
     
     print("✅ Todos los handlers configurados")
 
