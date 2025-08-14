@@ -69,6 +69,7 @@ def setup_handlers(application, sheets_controller: SheetsController):
     application.add_handler(MessageHandler(filters.PHOTO, sheets_controller.image_request))
     application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.P_ACEPTAR))
     application.add_handler(CallbackQueryHandler(sheets_controller.modify_gasto, pattern=Routes.P_MODIFICAR))
+    application.add_handler(CallbackQueryHandler(sheets_controller.cancelar_gasto, pattern=Routes.P_CANCELAR))
     application.add_handler(CommandHandler("summary", sheets_controller.summary))
 
     # Modificaciones
@@ -78,6 +79,7 @@ def setup_handlers(application, sheets_controller: SheetsController):
     application.add_handler(CallbackQueryHandler(sheets_controller.modify_fecha, pattern=Routes.P_MODIFICAR_FECHA))
     application.add_handler(CallbackQueryHandler(sheets_controller.modify_categoria, pattern=Routes.P_MODIFICAR_CATEGORIA))
     application.add_handler(CallbackQueryHandler(sheets_controller.modify_gasto, pattern=Routes.P_ATRAS_MODIFICACIONES))
+    application.add_handler(CallbackQueryHandler(sheets_controller.volver_menu, pattern=Routes.P_VOLVER_MENU))
     
     print("✅ Todos los handlers configurados")
 

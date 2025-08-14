@@ -70,13 +70,20 @@ class SheetsController:
         context.user_data["json"] = json
         formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(json)
         await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())
-
     
     @authorized_only
     async def submit_gasto(self, update: Update, context = CallbackContext):
         json_data = context.user_data["json"]
         self.sheet_service.upload_new_row(json_data)
         formatted_json = "🧾 **GASTO** 🧾\n\n" + json_formatter(json_data) + "\n\n✅ Subido"
+        context.user_data["json"] = None
+        await update.callback_query.answer()
+        await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN")
+    
+    @authorized_only
+    async def cancelar_gasto(self, update: Update, context = CallbackContext):
+        json_data = context.user_data["json"]
+        formatted_json = "🧾 **GASTO** 🧾\n\n" + json_formatter(json_data) + "\n\n❌ Cancelado"
         context.user_data["json"] = None
         await update.callback_query.answer()
         await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN")
@@ -210,6 +217,12 @@ class SheetsController:
                 json_str_data = update_param(json_str_data, waiting_for, texto)
                 await update.message.reply_text(f"✅ {str(waiting_for).capitalize()} actualizada a {texto}")
         await self.revision_de_gasto(update, context, json_str_data)
+
+    @authorized_only
+    async def volver_menu(self, update: Update, context = CallbackContext):
+        json_data = context.user_data["json"]
+        formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(json_data)
+        await update.callback_query.message.edit_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())   
 
     @authorized_only
     async def summary(self, update: Update, context = ContextTypes.DEFAULT_TYPE):

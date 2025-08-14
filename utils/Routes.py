@@ -2,6 +2,8 @@ class Routes:
     # Datos de callback
     ACEPTAR = "Aceptar"
     MODIFICAR = "Modificar"
+    CANCELAR = "Cancelar"
+    VOLVER_MENU = "Volver_Menu"
     MODIFICAR_ESTABLECIMIENTO = "Modificar_Establecimiento"
     MODIFICAR_IMPORTE = "Modificar_Importe"
     MODIFICAR_DESCRIPCION = "Modificar_Descripcion"
@@ -11,7 +13,9 @@ class Routes:
 
     # Patrones exactos para handlers
     P_ACEPTAR = f"^{ACEPTAR}$"
+    P_CANCELAR = f"^{CANCELAR}$"
     P_MODIFICAR = f"^{MODIFICAR}$"
+    P_VOLVER_MENU = f"^{VOLVER_MENU}$"
     P_MODIFICAR_ESTABLECIMIENTO = f"^{MODIFICAR_ESTABLECIMIENTO}$"
     P_MODIFICAR_IMPORTE = f"^{MODIFICAR_IMPORTE}$"
     P_MODIFICAR_DESCRIPCION = f"^{MODIFICAR_DESCRIPCION}$"

@@ -5,12 +5,9 @@ class MenuTemplate:
     @staticmethod
     def basic_menu():
         return InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton(text="✅ Aceptar", callback_data=Routes.ACEPTAR)
-            ],
-            [
-                InlineKeyboardButton(text="✏️ Modificar", callback_data=Routes.MODIFICAR)
-            ]
+            [ InlineKeyboardButton(text="✅ Aceptar", callback_data=Routes.ACEPTAR) ],
+            [ InlineKeyboardButton(text="✏️ Modificar", callback_data=Routes.MODIFICAR) ],
+            [ InlineKeyboardButton(text="❌ Cancelar", callback_data=Routes.CANCELAR) ]
         ])
 
     @staticmethod
@@ -21,7 +18,7 @@ class MenuTemplate:
             [ InlineKeyboardButton(text="📝 Descripción", callback_data=Routes.MODIFICAR_DESCRIPCION) ],
             [ InlineKeyboardButton(text="📅 Fecha", callback_data=Routes.MODIFICAR_FECHA) ],
             [ InlineKeyboardButton(text="🏷️ Categoría", callback_data=Routes.MODIFICAR_CATEGORIA) ],
-            [ InlineKeyboardButton(text="✅ Aceptar", callback_data=Routes.ACEPTAR) ]
+            [ InlineKeyboardButton(text="⬅️ Volver", callback_data=Routes.VOLVER_MENU) ]
         ])
     
     def volver_atras_a_modificaciones():
