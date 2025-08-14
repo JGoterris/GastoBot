@@ -28,3 +28,8 @@ def json_formatter(str_json: str):
 def to_list(str_json: str):
     data = json.loads(str_json)
     return [data["establecimiento"], data["importe"], data["descripcion"], data["fecha"], data["categoria"]]
+
+def update_param(str_json: str, param: str, new_value):
+    data = json.loads(str_json)
+    data[param] = new_value
+    return json.dumps(data)

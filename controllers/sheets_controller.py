@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes, CallbackContext, CallbackQueryHandler
 from services.GenaiService import GenaiService
 from services.SheetsService import SheetsService
 from utils.auth import authorized_only
-from utils.JsonUtil import json_fuller, json_formatter, to_list
+from utils.JsonUtil import json_fuller, json_formatter, update_param
 import os
 from utils.MenuTemplate import MenuTemplate
 import json
@@ -17,11 +17,13 @@ class SheetsController:
 
     @authorized_only
     async def text_request(self, update: Update, context = ContextTypes.DEFAULT_TYPE):
+        if context.user_data.get("waiting_for", None):
+            await self.realizar_modificacion(update, context)
+            return
+
         str_json = self.genai_service.basic_request(update.message.text)
         fulled_json = json_fuller(str_json)
-        formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(fulled_json)
-        context.user_data["json"] = fulled_json
-        await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())
+        await self.revision_de_gasto(update, context, fulled_json)
 
     @authorized_only
     async def audio_request(self, update: Update, context = ContextTypes.DEFAULT_TYPE):
@@ -37,9 +39,7 @@ class SheetsController:
                 os.remove(temp_path)
             
             fulled_json = json_fuller(result)
-            formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(fulled_json)
-            context.user_data["json"] = fulled_json
-            await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())
+            await self.revision_de_gasto(update, context, fulled_json)
                 
         except Exception as e:
             print(f"Error manejando voz: {e}")
@@ -60,14 +60,16 @@ class SheetsController:
                 os.remove(temp_path)
 
             fulled_json = json_fuller(result)
-            formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(fulled_json)
-
-            context.user_data["json"] = fulled_json
-            await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())
+            await self.revision_de_gasto(update, context, fulled_json)
 
         except Exception as e:
             print(f"Error manejando imagen: {e}")
             await update.message.reply_text("Ocurrió un error procesando tu imagen.")
+
+    async def revision_de_gasto(self, update: Update, context: ContextTypes.DEFAULT_TYPE, json: str):
+        context.user_data["json"] = json
+        formatted_json = "🧾 **REVISIÓN DE GASTO** 🧾\n\n" + json_formatter(json)
+        await update.message.reply_text(formatted_json, parse_mode="MARKDOWN", reply_markup=MenuTemplate.basic_menu())
 
     
     @authorized_only
@@ -186,6 +188,28 @@ class SheetsController:
             reply_markup=MenuTemplate.volver_atras_a_modificaciones()
         )
         await update.callback_query.answer()
+    
+    async def realizar_modificacion(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        waiting_for = context.user_data["waiting_for"]
+        json_str_data = context.user_data["json"]
+        texto = update.message.text
+        match waiting_for:
+            case "importe":
+                if re.fullmatch(r"\d+(\.\d{1,2})?", texto):
+                    json_str_data = update_param(json_str_data, "importe", texto)
+                    await update.message.reply_text(f"✅ Importe actualizado a {texto} €")
+                else:
+                    await update.message.reply_text("❌ Formato inválido")
+            case "fecha":
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", texto):
+                    json_str_data = update_param(json_str_data, "importe", texto)
+                    await update.message.reply_text(f"✅ Fecha actualizada a {texto}")
+                else:
+                    await update.message.reply_text("❌ Formato inválido")
+            case _:
+                json_str_data = update_param(json_str_data, waiting_for, texto)
+                await update.message.reply_text(f"✅ {str(waiting_for).capitalize()} actualizada a {texto}")
+        await self.revision_de_gasto(update, context, json_str_data)
 
     @authorized_only
     async def summary(self, update: Update, context = ContextTypes.DEFAULT_TYPE):
