@@ -59,15 +59,25 @@ def initialize_genai_service():
 def setup_handlers(application, sheets_controller: SheetsController):
     """Configurar todos los handlers del bot"""
         
-    # Comando temporal para configuración (comentar después de configurar)
     application.add_handler(CommandHandler("myid", auth.get_user_id))
+    application.add_handler(CommandHandler("start", sheets_controller.start))
+    application.add_handler(CommandHandler("help", sheets_controller.help))
 
     # Funcionamiento principal
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, sheets_controller.text_request))
     application.add_handler(MessageHandler(filters.VOICE, sheets_controller.audio_request))
     application.add_handler(MessageHandler(filters.PHOTO, sheets_controller.image_request))
-    application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.ACEPTAR))
+    application.add_handler(CallbackQueryHandler(sheets_controller.submit_gasto, pattern=Routes.P_ACEPTAR))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_gasto, pattern=Routes.P_MODIFICAR))
     application.add_handler(CommandHandler("summary", sheets_controller.summary))
+
+    # Modificaciones
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_establecimiento, pattern=Routes.P_MODIFICAR_ESTABLECIMIENTO))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_importe, pattern=Routes.P_MODIFICAR_IMPORTE))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_descripcion, pattern=Routes.P_MODIFICAR_DESCRIPCION))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_fecha, pattern=Routes.P_MODIFICAR_FECHA))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_categoria, pattern=Routes.P_MODIFICAR_CATEGORIA))
+    application.add_handler(CallbackQueryHandler(sheets_controller.modify_gasto, pattern=Routes.P_ATRAS_MODIFICACIONES))
     
     print("✅ Todos los handlers configurados")
 
